@@ -1,0 +1,42 @@
+{
+  "name": "themes-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "",
+    "build": "npm test && npm run clean:dist && tsc && npm run copy:dist",
+    "copy:dist": "cp -R core/sass/. dist",
+    "clean:dist": "rimraf dist",
+    "test": "jest"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/__tests__/.*spec\\.(ts|js)$"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^22.2.0",
+    "@types/node": "^9.4.6",
+    "clean-css": "^4.1.11",
+    "glob": "^7.1.2",
+    "hex-to-rgba": "^1.0.1",
+    "jest": "^22.4.2",
+    "node-sass": "^4.7.2",
+    "postcss": "^6.0.19",
+    "postcss-node-sass": "^2.1.4",
+    "rimraf": "^2.6.2",
+    "tmp": "0.0.33",
+    "ts-jest": "^22.4.1",
+    "typescript": "^2.7.2"
+  }
+}
