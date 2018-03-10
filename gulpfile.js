@@ -2,7 +2,7 @@ const rename = require("gulp-rename");
 const sass = require('postcss-node-sass');
 const postcss = require('gulp-postcss');
 const gulp = require('gulp');
-const {initThemify, themify} = require('./core/themify.ts');
+const {initThemify, themify} = require('./src/themify.ts');
 const path = require('path');
 
 const pallete = require(path.join(__dirname, './src/theme/pallete.ts'));

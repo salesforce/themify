@@ -9,7 +9,7 @@ const postcss = require('postcss');
 const sass = require('postcss-node-sass');
 const pallete = require(path.join(__dirname, './pallete.ts'));
 const tinyPallete = require(path.join(__dirname, './tiny-pallete.ts'));
-const {initThemify, themify} = require('../core/themify');
+const {initThemify, themify} = require('../src/themify');
 
 export class TestUtils {
 
