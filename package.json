@@ -23,6 +23,12 @@
     },
     "testRegex": "/__tests__/.*spec\\.(ts|js)$"
   },
+  "lint-staged": {
+  "src/**/*.ts": [
+    "npm run format",
+    "git add"
+  ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
