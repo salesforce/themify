@@ -10,7 +10,7 @@
     "clean:dist": "rimraf dist",
     "format": "prettier --write --config .prettierrc src/*.ts src/**/*.ts",
     "test": "jest",
-    "lint:commit": "commitlint -e $GIT_PARAMS",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
     "precommit": "lint-staged"
   },
   "jest": {
