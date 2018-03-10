@@ -1,4 +1,4 @@
-const {isArray} = Array;
+const { isArray } = Array;
 
 /**
  * Convert a JS object to SASS
@@ -7,7 +7,6 @@ const {isArray} = Array;
  * @param jsValue
  */
 function jsToSassString(jsValue) {
-
   function _jsToSassString(value, initialIndentLevel = 0) {
     let indentLevel = initialIndentLevel;
 
@@ -25,8 +24,8 @@ function jsToSassString(jsValue) {
           const jsObj = value;
           let sassKeyValPairs: string[] = [];
 
-          sassKeyValPairs = Object.keys(jsObj)
-            .reduce((result, key: string) => {
+          sassKeyValPairs = Object.keys(jsObj).reduce(
+            (result, key: string) => {
               const jsVal = jsObj[key];
               const sassVal: string = _jsToSassString(jsVal, indentLevel);
 
@@ -35,7 +34,9 @@ function jsToSassString(jsValue) {
               }
 
               return result;
-            }, [] as string[]);
+            },
+            [] as string[]
+          );
 
           const result = `(\n${indent + sassKeyValPairs.join(',\n' + indent)}\n${indentsToSpaces(indentLevel - 1)})`;
           indentLevel -= 1;

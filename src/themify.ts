@@ -6,42 +6,42 @@ const path = require('path');
 const jsToSass = require(path.join(__dirname, './helpers/jsToSassString.ts'));
 
 export interface ThemifyOptions {
+  /**
+   * Whether we would like to generate the CSS variables.
+   * This should be true, unless you want to inject them yourself.
+   */
+  createVars: boolean;
+
+  /**
+   * Pallete configuration
+   */
+  pallete: any;
+
+  /**
+   * A class prefix to append to the generated themes classes
+   */
+  classPrefix: string;
+
+  /**
+   * Whether to generate a fallback for legacy browsers (ahm..ahm..) that do not supports CSS Variables
+   */
+  screwIE11: boolean;
+
+  /**
+   * Legacy browser fallback
+   */
+  fallback: {
     /**
-     * Whether we would like to generate the CSS variables.
-     * This should be true, unless you want to inject them yourself.
+     * An absolute path to the fallback CSS.
      */
-    createVars: boolean;
+    cssPath: string | null;
 
     /**
-     * Pallete configuration
+     * An absolute path to the fallback JSON.
+     * This file contains variable that will be replace in runtime, for legacy browsers
      */
-    pallete: any;
-
-    /**
-     * A class prefix to append to the generated themes classes
-     */
-    classPrefix: string;
-
-    /**
-     * Whether to generate a fallback for legacy browsers (ahm..ahm..) that do not supports CSS Variables
-     */
-    screwIE11: boolean;
-
-    /**
-     * Legacy browser fallback
-     */
-    fallback: {
-        /**
-         * An absolute path to the fallback CSS.
-         */
-        cssPath: string | null;
-
-        /**
-         * An absolute path to the fallback JSON.
-         * This file contains variable that will be replace in runtime, for legacy browsers
-         */
-        dynamicPath: string | null;
-    }
+    dynamicPath: string | null;
+  };
 }
 
 const defaultOptions: ThemifyOptions = {
@@ -62,7 +62,6 @@ const ColorVariation = {
 };
 
 function buildOptions(options: ThemifyOptions) {
-
   if (!options) {
     throw new Error(`options is required.`);
   }
@@ -78,12 +77,12 @@ function buildOptions(options: ThemifyOptions) {
     validateFilePath(options.fallback.cssPath, 'fallback.cssPath');
   }
 
-  return {...{}, ...defaultOptions, ...options};
+  return { ...{}, ...defaultOptions, ...options };
 }
 
 function writeToFile(filePath: string, output: string) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(filePath, output, (err) => {
+    fs.writeFile(filePath, output, err => {
       if (err) reject();
       resolve();
     });
@@ -109,7 +108,9 @@ function validateFilePath(filePath: string | null, name: string) {
  * @param value
  */
 function getRgbaNumbers(value: string) {
-  return hexToRgba(value).replace('rgba(', '').replace(', 1)', '')
+  return hexToRgba(value)
+    .replace('rgba(', '')
+    .replace(', 1)', '');
 }
 
 /** Define the default variation */
@@ -120,7 +121,6 @@ const variationValues: string[] = (Object as any).values(ColorVariation);
 const nonDefaultVariations: string[] = variationValues.filter(v => v !== defaultVariation);
 
 function themify(options: ThemifyOptions) {
-
   const removeNewLineRegex = /(\r\n|\n|\r)/gm;
   /** Regex to get the value inside the themify parenthesis */
   const themifyRegExp = /themify\(([^)]+)\)/gi;
@@ -129,15 +129,14 @@ function themify(options: ThemifyOptions) {
    * Define the method of color execution
    */
   const enum ExecutionMode {
-    CSS_VAR ='CSS_VAR',
+    CSS_VAR = 'CSS_VAR',
     CSS_COLOR = 'CSS_COLOR',
     DYNAMIC_EXPRESSION = 'DYNAMIC_EXPRESSION'
-  };
+  }
 
   options = buildOptions(options);
 
-  return (root) => {
-
+  return root => {
     // process fallback CSS, without mutating the rules
     if (options.screwIE11 === false) {
       processFallbackRules(root);
@@ -145,7 +144,6 @@ function themify(options: ThemifyOptions) {
 
     // mutate the existing rules
     processRules(root);
-
   };
 
   /**
@@ -156,7 +154,6 @@ function themify(options: ThemifyOptions) {
    * @example 1px solid themify({"light": ["primary-200", "1"], "dark": ["primary-200", "1"]})
    */
   function getThemifyValue(propertyValue: string, execMode: ExecutionMode) {
-
     /** Remove the start and end ticks **/
     propertyValue = propertyValue.replace(/'/g, '');
     const colorVariations = {};
@@ -165,8 +162,7 @@ function themify(options: ThemifyOptions) {
       let parsedValue;
       try {
         parsedValue = JSON.parse(value);
-      }
-      catch (ex) {
+      } catch (ex) {
         throw new Error(`fail to parse the following expression: ${value}.`);
       }
 
@@ -181,19 +177,15 @@ function themify(options: ThemifyOptions) {
       if (!Array.isArray(currentValue)) {
         // color, alpha
         parsedValue[variationName] = [currentValue, 1];
-      }
-      else if (!currentValue.length || !currentValue[0]) {
-        throw new Error("Oops. Received an empty color!");
+      } else if (!currentValue.length || !currentValue[0]) {
+        throw new Error('Oops. Received an empty color!');
       }
 
-      if (options.pallete)
-
-      return parsedValue[variationName];
+      if (options.pallete) return parsedValue[variationName];
     }
 
     // iterate through all variations
-    variationValues.forEach((variationName) => {
-
+    variationValues.forEach(variationName => {
       // replace all 'themify' tokens with the right string
       colorVariations[variationName] = propertyValue.replace(themifyRegExp, (occurrence, value) => {
         // parse and normalize the color
@@ -201,7 +193,6 @@ function themify(options: ThemifyOptions) {
         // convert it to the right format
         return translateColor(parsedColor, variationName, execMode);
       });
-
     });
 
     return colorVariations;
@@ -224,7 +215,6 @@ function themify(options: ThemifyOptions) {
 
     switch (execMode) {
       case ExecutionMode.CSS_COLOR:
-
         // with default alpha - just returns the color
         if (alpha === '1') {
           return palleteColor;
@@ -239,9 +229,7 @@ function themify(options: ThemifyOptions) {
         // return an rgba with the CSS variable name
         return `rgba(var(--${colorVar}), ${alpha})`;
     }
-
   }
-
 
   /**
    * Walk through all rules, and replace each themify occurrence with the corresponding CSS variable.
@@ -250,7 +238,6 @@ function themify(options: ThemifyOptions) {
    */
   function processRules(root) {
     root.walkRules(rule => {
-
       let aggragatedSelectorsMap = {};
       let aggragatedSelectors: string[] = [];
 
@@ -259,8 +246,7 @@ function themify(options: ThemifyOptions) {
         [defaultVariation]: rule
       };
 
-      rule.walkDecls((decl) => {
-
+      rule.walkDecls(decl => {
         const propertyValue = decl.value;
         if (!hasThemify(propertyValue)) return;
 
@@ -271,8 +257,7 @@ function themify(options: ThemifyOptions) {
         decl.value = defaultVariationValue;
 
         // create a new declaration and append it to each rule
-        nonDefaultVariations.forEach((variationName) => {
-
+        nonDefaultVariations.forEach(variationName => {
           const currentValue = variationValueMap[variationName];
           // when the declaration is the same as the default variation,
           // we just need to concatenate our selector to the default rule
@@ -283,8 +268,7 @@ function themify(options: ThemifyOptions) {
               aggragatedSelectorsMap[variationName] = true;
               aggragatedSelectors.push(selector);
             }
-          }
-          else {
+          } else {
             // creating the rule for the first time
             if (!variationRules[variationName]) {
               const clonedRule = createRuleWithVariation(rule, variationName);
@@ -297,7 +281,6 @@ function themify(options: ThemifyOptions) {
             variationRules[variationName].append(variationDecl);
           }
         });
-
       });
 
       if (aggragatedSelectors.length) {
@@ -308,7 +291,6 @@ function themify(options: ThemifyOptions) {
       if (createdRules.length) {
         createdRules.forEach(r => root.append(r));
       }
-
     });
   }
 
@@ -321,31 +303,27 @@ function themify(options: ThemifyOptions) {
    * @param root
    */
   function processFallbackRules(root) {
-
     // an output for each execution mode
     const output = {
       [ExecutionMode.CSS_COLOR]: [],
       [ExecutionMode.DYNAMIC_EXPRESSION]: {}
     };
     // initialize DYNAMIC_EXPRESSION with all existing variations
-    variationValues.forEach(variation => output[ExecutionMode.DYNAMIC_EXPRESSION][variation] = []);
+    variationValues.forEach(variation => (output[ExecutionMode.DYNAMIC_EXPRESSION][variation] = []));
 
     // define which modes need to be processed
     const execModes = [ExecutionMode.CSS_COLOR, ExecutionMode.DYNAMIC_EXPRESSION];
 
     root.walkRules(rule => {
-
       const ruleModeMap = {};
 
-      rule.walkDecls((decl) => {
-
+      rule.walkDecls(decl => {
         const propertyValue = decl.value;
         if (!hasThemify(propertyValue)) return;
 
         const property = decl.prop;
 
-        execModes.forEach((mode) => {
-
+        execModes.forEach(mode => {
           // lazily creating a new rule for each variation, for the specific mode
           if (!ruleModeMap.hasOwnProperty(mode)) {
             ruleModeMap[mode] = {};
@@ -354,9 +332,8 @@ function themify(options: ThemifyOptions) {
               let newRule;
               if (variationName === defaultVariation) {
                 newRule = cloneEmptyRule(rule);
-              }
-              else {
-                newRule = createRuleWithVariation(rule, variationName)
+              } else {
+                newRule = createRuleWithVariation(rule, variationName);
               }
 
               // push the new rule into the right place,
@@ -368,34 +345,31 @@ function themify(options: ThemifyOptions) {
               rulesOutput.push(newRule);
 
               ruleModeMap[mode][variationName] = newRule;
-
             });
           }
 
           const colorMap = getThemifyValue(propertyValue, mode);
 
           // create and append a new declaration
-          variationValues.forEach((variationName) => {
+          variationValues.forEach(variationName => {
             const newDecl = createDecl(property, colorMap[variationName]);
             ruleModeMap[mode][variationName].append(newDecl);
           });
-
         });
-
       });
     });
 
     // write the CSS & JSON to external files
     if (output[ExecutionMode.CSS_COLOR].length) {
       // write CSS fallback;
-      const fallbackCss = output[ExecutionMode.CSS_COLOR].join("");
+      const fallbackCss = output[ExecutionMode.CSS_COLOR].join('');
       writeToFile(options.fallback.cssPath as string, fallbackCss);
 
       // creating a JSON for the dynamic expressions
       const jsonOutput = {};
       variationValues.forEach(variationName => {
         jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
-        jsonOutput[variationName] = jsonOutput[variationName].join("").replace(removeNewLineRegex, "");
+        jsonOutput[variationName] = jsonOutput[variationName].join('').replace(removeNewLineRegex, '');
       });
 
       // stringify and save
@@ -405,7 +379,7 @@ function themify(options: ThemifyOptions) {
   }
 
   function createDecl(prop, value) {
-    return postcss.decl({prop, value});
+    return postcss.decl({ prop, value });
   }
 
   /**
@@ -423,7 +397,7 @@ function themify(options: ThemifyOptions) {
    */
   function createRuleWithVariation(rule, variationName) {
     const selector = getSelectorName(rule, variationName);
-    return postcss.rule({selector});
+    return postcss.rule({ selector });
   }
 
   /**
@@ -434,9 +408,11 @@ function themify(options: ThemifyOptions) {
   function getSelectorName(rule, variationName) {
     const selectorPrefix = `.${options.classPrefix || ''}${variationName}`;
 
-    return rule.selectors.map(selector => {
-      return `${selectorPrefix} ${selector}`;
-    }).join(',');
+    return rule.selectors
+      .map(selector => {
+        return `${selectorPrefix} ${selector}`;
+      })
+      .join(',');
   }
 
   function cloneEmptyRule(rule) {
@@ -445,7 +421,6 @@ function themify(options: ThemifyOptions) {
     clonedRule.removeAll();
     return clonedRule;
   }
-
 }
 
 /**
@@ -453,16 +428,14 @@ function themify(options: ThemifyOptions) {
  * This file should be injected into your bundle.
  */
 function init(options) {
-
   options = buildOptions(options);
 
-  return (root) => {
+  return root => {
     const pallete = options.pallete;
     const css = generateVars(pallete, options.classPrefix);
 
     const parsedCss = postcss.parse(css);
     root.prepend(parsedCss);
-
   };
 
   /**
@@ -484,7 +457,6 @@ function init(options) {
    *
    */
   function generateVars(pallete, prefix) {
-
     let cssOutput = '';
     prefix = prefix || '';
 
@@ -501,14 +473,15 @@ function init(options) {
       const variationKeys = Object.keys(variationColors);
 
       // generate CSS variables
-      const vars = variationKeys.map(varName => {
-        return `--${varName}: ${getRgbaNumbers(variationColors[varName])};`
-      }).join(' ');
+      const vars = variationKeys
+        .map(varName => {
+          return `--${varName}: ${getRgbaNumbers(variationColors[varName])};`;
+        })
+        .join(' ');
 
       // concatenate the variables to the output
       const output = `${selector} {${vars}}`;
       cssOutput = `${cssOutput} ${output}`;
-
     });
 
     // generate the $pallete variable
@@ -517,7 +490,6 @@ function init(options) {
     return cssOutput;
   }
 }
-
 
 module.exports = {
   initThemify: postcss.plugin('datoThemes', init),
