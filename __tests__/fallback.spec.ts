@@ -1,5 +1,5 @@
 import {TestUtils} from "./test.util";
-import {ThemifyOptions} from "../core/themify";
+import {ThemifyOptions} from "../src/themify";
 
 const glob = require("glob");
 const tmp = require('tmp');

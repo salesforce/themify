@@ -1,9 +1,8 @@
 const postcss = require('postcss');
-const fs = require('fs');
+const fs = require('fs-extra');
 const hexToRgba = require('hex-to-rgba');
 const THEMIFY = 'themify';
-const path = require('path');
-const jsToSass = require(path.join(__dirname, './helpers/jsToSassString.ts'));
+const JSToSass = require('./helpers/js-sass');
 
 export interface ThemifyOptions {
   /**
@@ -71,36 +70,22 @@ function buildOptions(options: ThemifyOptions) {
     throw new Error(`The 'pallete' option is required.`);
   }
 
-  // validate files path
-  if (options.fallback) {
-    validateFilePath(options.fallback.dynamicPath, 'fallback.dynamicPath');
-    validateFilePath(options.fallback.cssPath, 'fallback.cssPath');
-  }
-
-  return { ...{}, ...defaultOptions, ...options };
+  return { ...defaultOptions, ...options };
 }
 
+/**
+ *
+ * @param {string} filePath
+ * @param {string} output
+ * @returns {Promise<any>}
+ */
 function writeToFile(filePath: string, output: string) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(filePath, output, err => {
+    fs.outputFile(filePath, output, err => {
       if (err) reject();
       resolve();
     });
   });
-}
-
-/**
- * Throwing an Error if the given path doesn't exists
- * @param filePath
- * @param name
- */
-function validateFilePath(filePath: string | null, name: string) {
-  if (!filePath) return;
-
-  const dirName = path.dirname(filePath);
-  if (!fs.existsSync(dirName)) {
-    throw new Error(`The following path: '${filePath}' is invalid for '${name}'.`);
-  }
 }
 
 /**
@@ -363,6 +348,7 @@ function themify(options: ThemifyOptions) {
     if (output[ExecutionMode.CSS_COLOR].length) {
       // write CSS fallback;
       const fallbackCss = output[ExecutionMode.CSS_COLOR].join('');
+
       writeToFile(options.fallback.cssPath as string, fallbackCss);
 
       // creating a JSON for the dynamic expressions
@@ -374,6 +360,7 @@ function themify(options: ThemifyOptions) {
 
       // stringify and save
       const dynamicCss = JSON.stringify(jsonOutput);
+
       writeToFile(options.fallback.dynamicPath as string, dynamicCss);
     }
   }
@@ -485,7 +472,7 @@ function init(options) {
     });
 
     // generate the $pallete variable
-    cssOutput += `$pallete: ${jsToSass(pallete)};`;
+    cssOutput += `$pallete: ${JSToSass(pallete)};`;
 
     return cssOutput;
   }

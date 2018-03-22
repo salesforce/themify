@@ -6,8 +6,8 @@ const { isArray } = Array;
  * @example {color: 'red'} -> (color: red)
  * @param jsValue
  */
-function jsToSassString(jsValue) {
-  function _jsToSassString(value, initialIndentLevel = 0) {
+function JSToSASS(jsValue) {
+  function _JSToSASS(value, initialIndentLevel = 0) {
     let indentLevel = initialIndentLevel;
 
     switch (typeof value) {
@@ -27,7 +27,7 @@ function jsToSassString(jsValue) {
           sassKeyValPairs = Object.keys(jsObj).reduce(
             (result, key: string) => {
               const jsVal = jsObj[key];
-              const sassVal: string = _jsToSassString(jsVal, indentLevel);
+              const sassVal: string = _JSToSASS(jsVal, indentLevel);
 
               if (isNotUndefined(sassVal)) {
                 result.push(`${key}: ${sassVal}`);
@@ -47,7 +47,7 @@ function jsToSassString(jsValue) {
           for (let i = 0; i < value.length; i++) {
             const v = value[i];
             if (isNotUndefined(v)) {
-              sassVals.push(_jsToSassString(v, indentLevel));
+              sassVals.push(_JSToSASS(v, indentLevel));
             }
           }
 
@@ -62,7 +62,7 @@ function jsToSassString(jsValue) {
     }
   }
 
-  return _jsToSassString(jsValue);
+  return _JSToSASS(jsValue);
 }
 
 function indentsToSpaces(indentCount: number) {
@@ -81,4 +81,4 @@ function isNotUndefined(value) {
   return typeof value !== 'undefined';
 }
 
-module.exports = jsToSassString;
+module.exports = JSToSASS;

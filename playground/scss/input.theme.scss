@@ -1,0 +1,8 @@
+h1 {
+  color: themify(accent-300);
+  background: linear-gradient(to right, themify(primary-100), themify(accent-100));
+}
+
+p {
+  color: themify((dark: primary-100, light: accent-300));
+}
