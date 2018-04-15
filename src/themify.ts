@@ -3,6 +3,9 @@ const fs = require('fs-extra');
 const hexToRgba = require('hex-to-rgba');
 const THEMIFY = 'themify';
 const JSToSass = require('./helpers/js-sass');
+const _cleanCSS = require('clean-css');
+
+const cleanCSS = new _cleanCSS();
 
 export interface ThemifyOptions {
   /**
@@ -80,12 +83,7 @@ function buildOptions(options: ThemifyOptions) {
  * @returns {Promise<any>}
  */
 function writeToFile(filePath: string, output: string) {
-  return new Promise((resolve, reject) => {
-    fs.outputFile(filePath, output, err => {
-      if (err) reject();
-      resolve();
-    });
-  });
+  return fs.outputFile(filePath, output);
 }
 
 /**
@@ -241,6 +239,13 @@ function themify(options: ThemifyOptions) {
         const defaultVariationValue = variationValueMap[defaultVariation];
         decl.value = defaultVariationValue;
 
+        // indicate if we have a global rule, that cannot be nested
+        const isGlobalRule = rule.parent && rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name);
+        // don't create extra CSS for global rules
+        if (isGlobalRule) {
+          return;
+        }
+
         // create a new declaration and append it to each rule
         nonDefaultVariations.forEach(variationName => {
           const currentValue = variationValueMap[variationName];
@@ -356,6 +361,8 @@ function themify(options: ThemifyOptions) {
       variationValues.forEach(variationName => {
         jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
         jsonOutput[variationName] = jsonOutput[variationName].join('').replace(removeNewLineRegex, '');
+        // minify the CSS output
+        jsonOutput[variationName] = cleanCSS.minify(jsonOutput[variationName]).styles;
       });
 
       // stringify and save

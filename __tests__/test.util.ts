@@ -16,7 +16,6 @@ export class TestUtils {
     private static _cleanCss;
     private static get cleanCss() {
         if (!this._cleanCss) {
-            console.log(typeof cleanCSS);
             this._cleanCss = new cleanCSS({});
         }
         return this._cleanCss;
