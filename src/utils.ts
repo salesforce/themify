@@ -1,3 +1,5 @@
+let JSONFallbackCache;
+
 export type Theme = {
   [name: string]: {
     [variable: string]: string;
@@ -9,7 +11,7 @@ export type Theme = {
  * @param {string} path
  * @param {(event: Event) => void} cb
  */
-export function loadScript(path: string, cb: (this: HTMLElement, event: Event) => void) {
+function loadScript(path: string, cb: (this: HTMLElement, event: Event) => void) {
   const head = document.getElementsByTagName('head')[0];
   const script = document.createElement('script');
   script.src = path;
@@ -36,6 +38,8 @@ export function loadCSS(path: string) {
  */
 export function injectStyle(style: string) {
   var node = document.createElement('style');
+  node.id = 'themify';
+  console.log('injecting style', style);
   node.innerHTML = style;
   document.head.appendChild(node);
 }
@@ -99,28 +103,43 @@ export function loadCSSVariablesFallback() {
   }
 }
 
-/**
- *
- * @param customTheme
- */
-export function replaceColors(customTheme: Theme, pallete) {
-  if (customTheme) {
-    if (hasNativeCSSProperties()) {
-      const newColors = generateNewVariables(customTheme);
-      injectStyle(newColors);
-    } else {
-      loadScript('/dist/theme_fallback.js', () => {
-        handleUnSupportedBrowsers(customTheme, pallete, (window as any).themify);
-      });
-    }
-  }
+function loadJSON(url, cb) {
+  const req = new XMLHttpRequest();
+  req.overrideMimeType('application/json');
+  req.open('GET', url, true);
+  req.onload = function() {
+    cb(JSON.parse(req.responseText));
+  };
+  req.send(null);
 }
 
 /**
  *
  * @param customTheme
  */
-export function handleUnSupportedBrowsers(customTheme: Theme, pallete: Theme, JSONFallback) {
+export function replaceColors(fallbackJSONPath, customTheme, pallete) {
+  if (customTheme) {
+    if (hasNativeCSSProperties()) {
+      const newColors = generateNewVariables(customTheme);
+      injectStyle(newColors);
+    } else {
+      const replace = JSONFallback => {
+        JSONFallbackCache = JSONFallback;
+        handleUnSupportedBrowsers(customTheme, pallete, JSONFallbackCache);
+      };
+      if (JSONFallbackCache) {
+        replace(JSONFallbackCache);
+      } else {
+        loadJSON(fallbackJSONPath, replace);
+      }
+    }
+  }
+}
+/**
+ *
+ * @param customTheme
+ */
+export function handleUnSupportedBrowsers(customTheme, pallete, JSONFallback) {
   const themifyRegExp = /%\[(.*?)\]%/gi;
   const merged = mergeDeep(pallete, customTheme);
 
@@ -136,7 +155,6 @@ export function handleUnSupportedBrowsers(customTheme: Theme, pallete: Theme, JS
   }, '');
 
   injectStyle(finalOutput);
-  return finalOutput;
 }
 
 /**
@@ -232,3 +250,10 @@ function mergeDeep(target, ...sources) {
 function isObject(value: any) {
   return Object.prototype.toString.call(value) === '[object Object]';
 }
+
+module.exports = {
+  loadScript,
+  loadCSS,
+  replaceColors,
+  loadCSSVariablesFallback
+};

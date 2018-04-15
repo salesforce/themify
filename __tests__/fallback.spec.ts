@@ -14,7 +14,7 @@ const options: Partial<ThemifyOptions> = {
 };
 
 const inputFiles = glob.sync('__tests__/fallback/*.input.spec.scss');
-describe('Themify - Fallback', () => {
+fdescribe('Themify - Fallback', () => {
     inputFiles.forEach((inputFile) => {
         const testName = TestUtils.getTestName(inputFile);
         it(testName, (done) => {

@@ -1,13 +1,13 @@
 {
-  "name": "themes-playground",
+  "name": "@datorama/themify",
   "version": "1.0.0-beta",
   "description": "",
   "main": "index.js",
   "scripts": {
     "play": "gulp --gulpfile ./playground/gulpfile.js",
     "commit": "git-cz",
-    "build": "npm test && npm run clean:dist && tsc && npm run copy:dist",
-    "copy:dist": "cp -R src/sass/. dist",
+    "build": "npm run clean:dist && tsc && npm run copy:dist",
+    "copy:dist": "cp -R src/sass/. package.json dist",
     "clean:dist": "rimraf dist",
     "format": "prettier --write --config .prettierrc src/*.ts src/**/*.ts",
     "test": "jest",
@@ -34,7 +34,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^5.0.0"
+    "fs-extra": "^5.0.0",
+    "hex-to-rgba": "^1.0.1"
   },
   "config": {
     "commitizen": {
@@ -56,7 +57,6 @@
     "gulp-rename": "^1.2.2",
     "gulp-sass": "3.2.0",
     "gulp-typescript": "^4.0.1",
-    "hex-to-rgba": "^1.0.1",
     "husky": "^0.14.3",
     "jest": "^22.4.2",
     "lint-staged": "^7.0.0",

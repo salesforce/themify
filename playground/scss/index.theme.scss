@@ -1,3 +1,12 @@
 @import '../../dist/themify';
+
+$themeRules: (
+  'background-color',
+  'fill',
+  'color',
+  'stroke'
+);
+@include generateThemeHelpers($themeRules);
+
 @import 'button.theme';
 @import 'input.theme';

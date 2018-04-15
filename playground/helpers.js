@@ -1,23 +1,17 @@
-const whitelabel = {
-  "dark" : {
-    "primary-100": "#c333d3"
-  },
-  "light": {
-    "accent-300": "#ff0000"
-  }
-}
+let JSONFallbackCache;
 
 /**
  *
  * @param path
  */
-function loadScript( path, cb ) {
-  const head = document.getElementsByTagName('head')[0];
-  const script = document.createElement('script');
-  script.src = path;
-  script.type = 'text/javascript';
-  head.appendChild(script);
-  script.onload = cb;
+function loadJSON( url, cb ) {
+  const req = new XMLHttpRequest();
+  req.overrideMimeType("application/json");
+  req.open('GET', url, true);
+  req.onload = function() {
+    cb(JSON.parse(req.responseText));
+  };
+  req.send(null);
 }
 
 /**
@@ -28,6 +22,8 @@ function loadCSS( path ) {
   const head = document.getElementsByTagName('head')[0];
   const style = document.createElement('link');
   style.href = path;
+  //Todo: remove old tags?
+  style.id = 'themify-fallback';
   style.type = 'text/css';
   style.rel = 'stylesheet';
   head.appendChild(style);
@@ -39,6 +35,8 @@ function loadCSS( path ) {
  */
 function injectStyle( style ) {
   var node = document.createElement('style');
+  node.id = "themify";
+  console.log('injecting style', style);
   node.innerHTML = style;
   document.head.appendChild(node);
 }
@@ -78,6 +76,7 @@ function generateNewVariables( customTheme ) {
  * @returns {boolean}
  */
 function hasNativeCSSProperties() {
+  return false;
   const opacity = '1';
   const el = document.head;
   let hasNativeCSSProperties;
@@ -97,9 +96,9 @@ function hasNativeCSSProperties() {
 /**
  * Load the CSS fallback file on load
  */
-function loadCSSVariablesFallback() {
+function loadCSSVariablesFallback( fallbackPath ) {
   if( !hasNativeCSSProperties() ) {
-    loadCSS('/dist/theme_fallback.css');
+    loadCSS(fallbackPath);
   }
 }
 
@@ -107,15 +106,21 @@ function loadCSSVariablesFallback() {
  *
  * @param customTheme
  */
-function replaceColors( customTheme ) {
+function replaceColors( fallbackJSONPath, customTheme ) {
   if( customTheme ) {
     if( hasNativeCSSProperties() ) {
       const newColors = generateNewVariables(customTheme);
       injectStyle(newColors);
     } else {
-      loadScript('/dist/theme_fallback.js', () => {
-        handleUnSupportedBrowsers(customTheme);
-      });
+      const replace = ( JSONFallback ) => {
+        JSONFallbackCache = JSONFallback;
+        handleUnSupportedBrowsers(customTheme, JSONFallbackCache);
+      }
+      if( JSONFallbackCache ) {
+        replace(JSONFallbackCache);
+      } else {
+        loadJSON(fallbackJSONPath, replace);
+      }
     }
   }
 }
@@ -124,12 +129,12 @@ function replaceColors( customTheme ) {
  *
  * @param customTheme
  */
-function handleUnSupportedBrowsers( customTheme ) {
+function handleUnSupportedBrowsers( customTheme, JSONFallback ) {
   const themifyRegExp = /%\[(.*?)\]%/ig;
   const merged = mergeDeep(pallete, customTheme);
 
   let finalOutput = Object.keys(customTheme).reduce(( acc, variation ) => {
-    let value = window.themify[variation].replace(themifyRegExp, ( occurrence, value ) => {
+    let value = JSONFallback[variation].replace(themifyRegExp, ( occurrence, value ) => {
       const [variation, variable, opacity] = value.replace(/\s/g, '').split(',');
       const color = merged[variation][variable];
       const normalized = hexToRGB(color, opacity);
@@ -138,7 +143,6 @@ function handleUnSupportedBrowsers( customTheme ) {
 
     return acc += value;
   }, '');
-  console.log(finalOutput);
 
   injectStyle(finalOutput);
 }
@@ -203,9 +207,6 @@ function hexToRGB( hex, alpha = false ) {
   }
   return `rgb(${r}, ${g}, ${b})`;
 }
-
-replaceColors(whitelabel);
-loadCSSVariablesFallback();
 
 var pallete = {
   light: {
