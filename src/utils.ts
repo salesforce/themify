@@ -9,20 +9,6 @@ export type Theme = {
 /**
  *
  * @param {string} path
- * @param {(event: Event) => void} cb
- */
-function loadScript(path: string, cb: (this: HTMLElement, event: Event) => void) {
-  const head = document.getElementsByTagName('head')[0];
-  const script = document.createElement('script');
-  script.src = path;
-  script.type = 'text/javascript';
-  head.appendChild(script);
-  script.onload = cb;
-}
-
-/**
- *
- * @param {string} path
  */
 export function loadCSS(path: string) {
   const head = document.getElementsByTagName('head')[0];
@@ -97,9 +83,9 @@ export function hasNativeCSSProperties() {
 /**
  * Load the CSS fallback file on load
  */
-export function loadCSSVariablesFallback() {
+export function loadCSSVariablesFallback(path: string) {
   if (!hasNativeCSSProperties()) {
-    loadCSS('/dist/theme_fallback.css');
+    loadCSS(path);
   }
 }
 
@@ -252,8 +238,6 @@ function isObject(value: any) {
 }
 
 module.exports = {
-  loadScript,
-  loadCSS,
   replaceColors,
   loadCSSVariablesFallback
 };
