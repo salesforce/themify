@@ -64,20 +64,21 @@ export function generateNewVariables(customTheme: Theme) {
  * @returns {boolean}
  */
 export function hasNativeCSSProperties() {
-  const opacity = '1';
-  const el = document.head;
-  let hasNativeCSSProperties;
+  return false;
+  // const opacity = '1';
+  // const el = document.head;
+  // let hasNativeCSSProperties;
 
-  // Setup CSS properties.
-  el.style.setProperty('--test-opacity', opacity);
-  el.style.setProperty('opacity', 'var(--test-opacity)');
+  // // Setup CSS properties.
+  // el.style.setProperty('--test-opacity', opacity);
+  // el.style.setProperty('opacity', 'var(--test-opacity)');
 
-  // Feature detect then remove all set properties.
-  hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
-  el.style.setProperty('--test-opacity', '');
-  el.style.opacity = '';
+  // // Feature detect then remove all set properties.
+  // hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
+  // el.style.setProperty('--test-opacity', '');
+  // el.style.opacity = '';
 
-  return hasNativeCSSProperties;
+  // return hasNativeCSSProperties;
 }
 
 /**
