@@ -24,7 +24,6 @@ fdescribe('Themify - Fallback', () => {
 });
 
 function test(inputFile, done) {
-    console.log(inputFile);
     // creating temp files for the CSS & JSON files
     const {cssTmp, dynamicTmp} = {
         cssTmp: tmp.fileSync(),
@@ -58,7 +57,7 @@ function test(inputFile, done) {
             dynamicTmp.removeCallback();
 
             done();
-        });
+        }, 100);
 
     }, (err) => {
         console.log(err);
