@@ -22,7 +22,6 @@ function loadCSS(path) {
   const head = document.getElementsByTagName('head')[0];
   const style = document.createElement('link');
   style.href = path;
-  //Todo: remove old tags?
   style.id = 'themify-fallback';
   style.type = 'text/css';
   style.rel = 'stylesheet';
