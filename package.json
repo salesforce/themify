@@ -1,6 +1,6 @@
 {
-  "name": "themes-playground",
-  "version": "1.0.0-beta",
+  "name": "@datorama/themify",
+  "version": "0.1.0-beta",
   "description": "",
   "main": "index.js",
   "scripts": {
