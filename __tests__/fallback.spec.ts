@@ -1,11 +1,11 @@
 import {TestUtils} from "./test.util";
-import {ThemifyOptions} from "../src/themify";
+import {ThemifyOptions} from "../src/index";
 
 const glob = require("glob");
 const tmp = require('tmp');
 
 const options: Partial<ThemifyOptions> = {
-    pallete: TestUtils.tinyPallete,
+    palette: TestUtils.tinyPalette,
     screwIE11: false,
     fallback: {
         cssPath: '',

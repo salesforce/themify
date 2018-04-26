@@ -15,7 +15,6 @@
 
   @if function-exists('_json-encode--#{$type}') {
     @return call('_json-encode--#{$type}', $value);
-    //@return call(get-function('_json-encode--#{$type}'), $value);
   }
 
   @error 'Unknown type for #{$value} (#{$type}).';

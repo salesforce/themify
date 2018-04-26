@@ -23,11 +23,15 @@ export function loadCSS(path: string) {
  * @param {string} style
  */
 export function injectStyle(style: string) {
-  var node = document.createElement('style');
-  node.id = 'themify';
-  console.log('injecting style', style);
-  node.innerHTML = style;
-  document.head.appendChild(node);
+  const styleTag = document.getElementById('themify') as HTMLLinkElement;
+  if (!styleTag) {
+    var node = document.createElement('style');
+    node.id = 'themify';
+    node.innerHTML = style;
+    document.head.appendChild(node);
+  } else {
+    styleTag.innerHTML = style;
+  }
 }
 
 /**
@@ -43,7 +47,7 @@ export function injectStyle(style: string) {
  * @param customTheme
  * @returns {string}
  */
-export function generateNewVariables(customTheme: Theme) {
+export function _generateNewVariables(customTheme: Theme) {
   // First, we need the variations [dark, light]
   const variations = Object.keys(customTheme);
   return variations.reduce((finalOutput, variation) => {
@@ -64,21 +68,20 @@ export function generateNewVariables(customTheme: Theme) {
  * @returns {boolean}
  */
 export function hasNativeCSSProperties() {
-  return false;
-  // const opacity = '1';
-  // const el = document.head;
-  // let hasNativeCSSProperties;
+  const opacity = '1';
+  const el = document.head;
+  let hasNativeCSSProperties;
 
-  // // Setup CSS properties.
-  // el.style.setProperty('--test-opacity', opacity);
-  // el.style.setProperty('opacity', 'var(--test-opacity)');
+  // Setup CSS properties.
+  el.style.setProperty('--test-opacity', opacity);
+  el.style.setProperty('opacity', 'var(--test-opacity)');
 
-  // // Feature detect then remove all set properties.
-  // hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
-  // el.style.setProperty('--test-opacity', '');
-  // el.style.opacity = '';
+  // Feature detect then remove all set properties.
+  hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
+  el.style.setProperty('--test-opacity', '');
+  el.style.opacity = '';
 
-  // return hasNativeCSSProperties;
+  return hasNativeCSSProperties;
 }
 
 /**
@@ -104,15 +107,15 @@ function loadJSON(url, cb) {
  *
  * @param customTheme
  */
-export function replaceColors(fallbackJSONPath, customTheme, pallete) {
+export function replaceColors(fallbackJSONPath, customTheme, palette) {
   if (customTheme) {
     if (hasNativeCSSProperties()) {
-      const newColors = generateNewVariables(customTheme);
+      const newColors = _generateNewVariables(customTheme);
       injectStyle(newColors);
     } else {
       const replace = JSONFallback => {
         JSONFallbackCache = JSONFallback;
-        handleUnSupportedBrowsers(customTheme, pallete, JSONFallbackCache);
+        _handleUnSupportedBrowsers(customTheme, palette, JSONFallbackCache);
       };
       if (JSONFallbackCache) {
         replace(JSONFallbackCache);
@@ -126,9 +129,9 @@ export function replaceColors(fallbackJSONPath, customTheme, pallete) {
  *
  * @param customTheme
  */
-export function handleUnSupportedBrowsers(customTheme, pallete, JSONFallback) {
+export function _handleUnSupportedBrowsers(customTheme, palette, JSONFallback) {
   const themifyRegExp = /%\[(.*?)\]%/gi;
-  const merged = mergeDeep(pallete, customTheme);
+  const merged = mergeDeep(palette, customTheme);
 
   let finalOutput = Object.keys(customTheme).reduce((acc, variation) => {
     let value = JSONFallback[variation].replace(themifyRegExp, (occurrence, value) => {
@@ -142,6 +145,8 @@ export function handleUnSupportedBrowsers(customTheme, pallete, JSONFallback) {
   }, '');
 
   injectStyle(finalOutput);
+
+  return finalOutput;
 }
 
 /**
@@ -218,10 +223,15 @@ function mergeDeep(target, ...sources) {
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
+        if (!target[key])
+          Object.assign(target, {
+            [key]: {}
+          });
         mergeDeep(target[key], source[key]);
       } else {
-        Object.assign(target, { [key]: source[key] });
+        Object.assign(target, {
+          [key]: source[key]
+        });
       }
     }
   }
@@ -240,5 +250,7 @@ function isObject(value: any) {
 
 module.exports = {
   replaceColors,
-  loadCSSVariablesFallback
+  loadCSSVariablesFallback,
+  _handleUnSupportedBrowsers,
+  _generateNewVariables
 };

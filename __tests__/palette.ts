@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     light: {
         'primary-700': '#303030',
         'primary-600': '#383838',
