@@ -1,11 +1,11 @@
 import {TestUtils} from "./test.util";
-import {ThemifyOptions} from "../core/themify";
+import {ThemifyOptions} from "../src/index";
 
 const glob = require("glob");
 const tmp = require('tmp');
 
 const options: Partial<ThemifyOptions> = {
-    pallete: TestUtils.tinyPallete,
+    palette: TestUtils.tinyPalette,
     screwIE11: false,
     fallback: {
         cssPath: '',
@@ -14,7 +14,7 @@ const options: Partial<ThemifyOptions> = {
 };
 
 const inputFiles = glob.sync('__tests__/fallback/*.input.spec.scss');
-describe('Themify - Fallback', () => {
+fdescribe('Themify - Fallback', () => {
     inputFiles.forEach((inputFile) => {
         const testName = TestUtils.getTestName(inputFile);
         it(testName, (done) => {
@@ -24,7 +24,6 @@ describe('Themify - Fallback', () => {
 });
 
 function test(inputFile, done) {
-    console.log(inputFile);
     // creating temp files for the CSS & JSON files
     const {cssTmp, dynamicTmp} = {
         cssTmp: tmp.fileSync(),
@@ -58,7 +57,7 @@ function test(inputFile, done) {
             dynamicTmp.removeCallback();
 
             done();
-        });
+        }, 100);
 
     }, (err) => {
         console.log(err);

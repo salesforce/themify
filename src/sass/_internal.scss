@@ -1,3 +1,5 @@
+$PRESERVE_THEMIFY: false !default;
+
 /**
  * Credits to https://github.com/acss-io/atomizer/blob/master/src/lib/grammar.js
  */
@@ -63,6 +65,10 @@ $PSEUDO_CLASSES: (
 }
 
 @function themify($props...) {
+  @if ($PRESERVE_THEMIFY == true) {
+    @return unquote("themify(#{$props...})");
+  }
+
   @if (is-map($props...)) {
     $value: json-encode($props...);
     @return "themify(#{$value})";
@@ -92,7 +98,7 @@ $PSEUDO_CLASSES: (
 
   $pseudoClassSep: ':';
   @each $prop in $propsArr {
-    @each $pallete, $value in $pallete {
+    @each $palette, $value in $palette {
       @each $var in map-keys($value) {
 
         // split the string, to retrieve all pseudo classes

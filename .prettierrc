@@ -2,6 +2,6 @@
   "singleQuote": true,
   "tabWidth": 2,
   "useTabs": false,
-  "printWidth": 500,
+  "printWidth": 5000,
   "parser": "typescript"
 }
