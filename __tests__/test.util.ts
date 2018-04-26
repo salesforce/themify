@@ -1,22 +1,21 @@
-
-import {ProcessOptions} from "postcss";
-
 const cleanCSS =  require("clean-css");
 const glob = require("glob");
 const path = require('path');
 const fs = require('fs');
 const postcss = require('postcss');
 const sass = require('postcss-node-sass');
-const pallete = require(path.join(__dirname, './pallete.ts'));
-const tinyPallete = require(path.join(__dirname, './tiny-pallete.ts'));
-const {initThemify, themify} = require('../src/themify');
+
+import {ProcessOptions} from "postcss";
+import palette from './palette';
+import tinyPalette from './tiny-palette';
+
+const {initThemify, themify} = require('../src/index');
 
 export class TestUtils {
 
     private static _cleanCss;
     private static get cleanCss() {
         if (!this._cleanCss) {
-            console.log(typeof cleanCSS);
             this._cleanCss = new cleanCSS({});
         }
         return this._cleanCss;
@@ -28,11 +27,11 @@ export class TestUtils {
         themify
     };
 
-    static get defaultPallete() {
-        return pallete;
+    static get defaultPalette() {
+        return palette;
     }
-    static get tinyPallete() {
-        return tinyPallete;
+    static get tinyPalette() {
+        return tinyPalette;
     }
 
     static run(suite: string, filesGlob: string, plugins: any[], withError = false) {

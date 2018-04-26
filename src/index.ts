@@ -1,9 +1,11 @@
 const postcss = require('postcss');
-const fs = require('fs');
+const fs = require('fs-extra');
 const hexToRgba = require('hex-to-rgba');
 const THEMIFY = 'themify';
-const path = require('path');
-const jsToSass = require(path.join(__dirname, './helpers/jsToSassString.ts'));
+const JSToSass = require('./helpers/js-sass');
+const _cleanCSS = require('clean-css');
+
+const cleanCSS = new _cleanCSS();
 
 export interface ThemifyOptions {
   /**
@@ -13,9 +15,9 @@ export interface ThemifyOptions {
   createVars: boolean;
 
   /**
-   * Pallete configuration
+   * Palette configuration
    */
-  pallete: any;
+  palette: any;
 
   /**
    * A class prefix to append to the generated themes classes
@@ -46,7 +48,7 @@ export interface ThemifyOptions {
 
 const defaultOptions: ThemifyOptions = {
   createVars: true,
-  pallete: {},
+  palette: {},
   classPrefix: '',
   screwIE11: true,
   fallback: {
@@ -66,41 +68,22 @@ function buildOptions(options: ThemifyOptions) {
     throw new Error(`options is required.`);
   }
 
-  // make sure we have a pallete
-  if (!options.pallete) {
-    throw new Error(`The 'pallete' option is required.`);
+  // make sure we have a palette
+  if (!options.palette) {
+    throw new Error(`The 'palette' option is required.`);
   }
 
-  // validate files path
-  if (options.fallback) {
-    validateFilePath(options.fallback.dynamicPath, 'fallback.dynamicPath');
-    validateFilePath(options.fallback.cssPath, 'fallback.cssPath');
-  }
-
-  return { ...{}, ...defaultOptions, ...options };
-}
-
-function writeToFile(filePath: string, output: string) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(filePath, output, err => {
-      if (err) reject();
-      resolve();
-    });
-  });
+  return { ...defaultOptions, ...options };
 }
 
 /**
- * Throwing an Error if the given path doesn't exists
- * @param filePath
- * @param name
+ *
+ * @param {string} filePath
+ * @param {string} output
+ * @returns {Promise<any>}
  */
-function validateFilePath(filePath: string | null, name: string) {
-  if (!filePath) return;
-
-  const dirName = path.dirname(filePath);
-  if (!fs.existsSync(dirName)) {
-    throw new Error(`The following path: '${filePath}' is invalid for '${name}'.`);
-  }
+function writeToFile(filePath: string, output: string) {
+  return fs.outputFile(filePath, output);
 }
 
 /**
@@ -181,7 +164,7 @@ function themify(options: ThemifyOptions) {
         throw new Error('Oops. Received an empty color!');
       }
 
-      if (options.pallete) return parsedValue[variationName];
+      if (options.palette) return parsedValue[variationName];
     }
 
     // iterate through all variations
@@ -207,20 +190,20 @@ function themify(options: ThemifyOptions) {
   function translateColor(colorArr: [string, string], variationName: string, execMode: ExecutionMode) {
     const [colorVar, alpha] = colorArr;
     // returns the real color representation
-    const palleteColor = options.pallete[variationName][colorVar];
+    const paletteColor = options.palette[variationName][colorVar];
 
-    if (!palleteColor) {
-      throw new Error(`The variable name '${colorVar}' doesn't exists in your pallete.`);
+    if (!paletteColor) {
+      throw new Error(`The variable name '${colorVar}' doesn't exists in your palette.`);
     }
 
     switch (execMode) {
       case ExecutionMode.CSS_COLOR:
         // with default alpha - just returns the color
         if (alpha === '1') {
-          return palleteColor;
+          return paletteColor;
         }
         // with custom alpha, convert it to rgba
-        const rgbaColorArr = getRgbaNumbers(palleteColor);
+        const rgbaColorArr = getRgbaNumbers(paletteColor);
         return `rgba(${rgbaColorArr}, ${alpha})`;
       case ExecutionMode.DYNAMIC_EXPRESSION:
         // returns it in a unique pattern, so it will be easy to replace it in runtime
@@ -255,6 +238,13 @@ function themify(options: ThemifyOptions) {
         const variationValueMap = getThemifyValue(propertyValue, ExecutionMode.CSS_VAR);
         const defaultVariationValue = variationValueMap[defaultVariation];
         decl.value = defaultVariationValue;
+
+        // indicate if we have a global rule, that cannot be nested
+        const isGlobalRule = rule.parent && rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name);
+        // don't create extra CSS for global rules
+        if (isGlobalRule) {
+          return;
+        }
 
         // create a new declaration and append it to each rule
         nonDefaultVariations.forEach(variationName => {
@@ -363,6 +353,7 @@ function themify(options: ThemifyOptions) {
     if (output[ExecutionMode.CSS_COLOR].length) {
       // write CSS fallback;
       const fallbackCss = output[ExecutionMode.CSS_COLOR].join('');
+
       writeToFile(options.fallback.cssPath as string, fallbackCss);
 
       // creating a JSON for the dynamic expressions
@@ -370,10 +361,13 @@ function themify(options: ThemifyOptions) {
       variationValues.forEach(variationName => {
         jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
         jsonOutput[variationName] = jsonOutput[variationName].join('').replace(removeNewLineRegex, '');
+        // minify the CSS output
+        jsonOutput[variationName] = cleanCSS.minify(jsonOutput[variationName]).styles;
       });
 
       // stringify and save
       const dynamicCss = JSON.stringify(jsonOutput);
+
       writeToFile(options.fallback.dynamicPath as string, dynamicCss);
     }
   }
@@ -431,8 +425,8 @@ function init(options) {
   options = buildOptions(options);
 
   return root => {
-    const pallete = options.pallete;
-    const css = generateVars(pallete, options.classPrefix);
+    const palette = options.palette;
+    const css = generateVars(palette, options.classPrefix);
 
     const parsedCss = postcss.parse(css);
     root.prepend(parsedCss);
@@ -456,14 +450,14 @@ function init(options) {
  *   }
    *
    */
-  function generateVars(pallete, prefix) {
+  function generateVars(palette, prefix) {
     let cssOutput = '';
     prefix = prefix || '';
 
     // iterate through the different variations
-    Object.keys(pallete).forEach(variationName => {
+    Object.keys(palette).forEach(variationName => {
       const selector = variationName === ColorVariation.LIGHT ? ':root' : `.${prefix}${variationName}`;
-      const variationColors = pallete[variationName];
+      const variationColors = palette[variationName];
 
       // make sure we got colors for this variation
       if (!variationColors) {
@@ -484,8 +478,8 @@ function init(options) {
       cssOutput = `${cssOutput} ${output}`;
     });
 
-    // generate the $pallete variable
-    cssOutput += `$pallete: ${jsToSass(pallete)};`;
+    // generate the $palette variable
+    cssOutput += `$palette: ${JSToSass(palette)};`;
 
     return cssOutput;
   }
