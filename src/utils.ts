@@ -1,4 +1,5 @@
 let JSONFallbackCache;
+let _hasNativeSupport;
 
 export type Theme = {
   [name: string]: {
@@ -68,20 +69,23 @@ export function _generateNewVariables(customTheme: Theme) {
  * @returns {boolean}
  */
 export function hasNativeCSSProperties() {
+  if (_hasNativeSupport != null) {
+    return _hasNativeSupport;
+  }
+
   const opacity = '1';
   const el = document.head;
-  let hasNativeCSSProperties;
 
   // Setup CSS properties.
   el.style.setProperty('--test-opacity', opacity);
   el.style.setProperty('opacity', 'var(--test-opacity)');
 
   // Feature detect then remove all set properties.
-  hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
+  _hasNativeSupport = window.getComputedStyle(el).opacity == opacity;
   el.style.setProperty('--test-opacity', '');
   el.style.opacity = '';
 
-  return hasNativeCSSProperties;
+  return _hasNativeSupport;
 }
 
 /**
