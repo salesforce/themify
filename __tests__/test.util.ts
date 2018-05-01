@@ -6,8 +6,9 @@ const postcss = require('postcss');
 const sass = require('postcss-node-sass');
 
 import {ProcessOptions} from "postcss";
-import palette from './palette';
-import tinyPalette from './tiny-palette';
+import palette from './palettes/palette';
+import tinyPalette from './palettes/tiny-palette';
+import unmatchPallete from './palettes/unmatch-palette';
 
 const {initThemify, themify} = require('../src/index');
 
@@ -32,6 +33,9 @@ export class TestUtils {
     }
     static get tinyPalette() {
         return tinyPalette;
+    }
+    static get unmatchPalette() {
+        return unmatchPallete;
     }
 
     static run(suite: string, filesGlob: string, plugins: any[], withError = false) {

@@ -1,5 +1,5 @@
 import {_handleUnSupportedBrowsers, _generateNewVariables} from '../src/utils';
-import palette from './palette';
+import palette from './palettes/palette';
 
 const whitelabel = {
   "dark": {

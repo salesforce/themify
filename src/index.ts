@@ -1,3 +1,5 @@
+import { minifyJSON } from './helpers/json.util';
+
 const postcss = require('postcss');
 const fs = require('fs-extra');
 const hexToRgba = require('hex-to-rgba');
@@ -104,7 +106,6 @@ const variationValues: string[] = (Object as any).values(ColorVariation);
 const nonDefaultVariations: string[] = variationValues.filter(v => v !== defaultVariation);
 
 function themify(options: ThemifyOptions) {
-  const removeNewLineRegex = /(\r\n|\n|\r)/gm;
   /** Regex to get the value inside the themify parenthesis */
   const themifyRegExp = /themify\(([^)]+)\)/gi;
 
@@ -136,7 +137,7 @@ function themify(options: ThemifyOptions) {
    * @example themify({"light": ["primary-100", "1"], "dark": ["primary-100", "1"]})
    * @example 1px solid themify({"light": ["primary-200", "1"], "dark": ["primary-200", "1"]})
    */
-  function getThemifyValue(propertyValue: string, execMode: ExecutionMode) {
+  function getThemifyValue(propertyValue: string, execMode: ExecutionMode): { [variation: string]: string } {
     /** Remove the start and end ticks **/
     propertyValue = propertyValue.replace(/'/g, '');
     const colorVariations = {};
@@ -190,9 +191,13 @@ function themify(options: ThemifyOptions) {
   function translateColor(colorArr: [string, string], variationName: string, execMode: ExecutionMode) {
     const [colorVar, alpha] = colorArr;
     // returns the real color representation
-    const paletteColor = options.palette[variationName][colorVar];
+    const underlineColor = options.palette[variationName][colorVar];
 
-    if (!paletteColor) {
+    if (!underlineColor) {
+      // variable is not mandatory in non-default variations
+      if (variationName !== defaultVariation) {
+        return null;
+      }
       throw new Error(`The variable name '${colorVar}' doesn't exists in your palette.`);
     }
 
@@ -200,10 +205,10 @@ function themify(options: ThemifyOptions) {
       case ExecutionMode.CSS_COLOR:
         // with default alpha - just returns the color
         if (alpha === '1') {
-          return paletteColor;
+          return underlineColor;
         }
         // with custom alpha, convert it to rgba
-        const rgbaColorArr = getRgbaNumbers(paletteColor);
+        const rgbaColorArr = getRgbaNumbers(underlineColor);
         return `rgba(${rgbaColorArr}, ${alpha})`;
       case ExecutionMode.DYNAMIC_EXPRESSION:
         // returns it in a unique pattern, so it will be easy to replace it in runtime
@@ -249,6 +254,12 @@ function themify(options: ThemifyOptions) {
         // create a new declaration and append it to each rule
         nonDefaultVariations.forEach(variationName => {
           const currentValue = variationValueMap[variationName];
+
+          // variable for non-default variation is optional
+          if (!currentValue || currentValue === 'null') {
+            return;
+          }
+
           // when the declaration is the same as the default variation,
           // we just need to concatenate our selector to the default rule
           if (currentValue === defaultVariationValue) {
@@ -342,8 +353,11 @@ function themify(options: ThemifyOptions) {
 
           // create and append a new declaration
           variationValues.forEach(variationName => {
-            const newDecl = createDecl(property, colorMap[variationName]);
-            ruleModeMap[mode][variationName].append(newDecl);
+            const underlineColor = colorMap[variationName];
+            if (underlineColor && underlineColor !== 'null') {
+              const newDecl = createDecl(property, colorMap[variationName]);
+              ruleModeMap[mode][variationName].append(newDecl);
+            }
           });
         });
       });
@@ -360,7 +374,7 @@ function themify(options: ThemifyOptions) {
       const jsonOutput = {};
       variationValues.forEach(variationName => {
         jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
-        jsonOutput[variationName] = jsonOutput[variationName].join('').replace(removeNewLineRegex, '');
+        jsonOutput[variationName] = minifyJSON(jsonOutput[variationName].join(''));
         // minify the CSS output
         jsonOutput[variationName] = cleanCSS.minify(jsonOutput[variationName]).styles;
       });
