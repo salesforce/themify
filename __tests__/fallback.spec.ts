@@ -13,13 +13,8 @@ const options: Partial<ThemifyOptions> = {
     dynamicPath: ''
   }
 };
-const unmatchPaletteOptions: Partial<ThemifyOptions> = {
-  palette: TestUtils.unmatchPalette,
-  screwIE11: false,
-  fallback: {
-    cssPath: '',
-    dynamicPath: ''
-  }
+const unmatchPaletteOptions: Partial<ThemifyOptions> = {...options,
+  palette: TestUtils.unmatchPalette
 };
 
 const inputFiles = glob.sync('__tests__/fallback/*.input.spec.scss');
@@ -47,8 +42,7 @@ function test(inputFile, options, done) {
     dynamicTmp: tmp.fileSync()
   };
 
-  const myOptions = {
-    ...{}, ...options, ...{
+  const myOptions = {...options, ...{
       fallback: {
         cssPath: cssTmp.name,
         dynamicPath: dynamicTmp.name
