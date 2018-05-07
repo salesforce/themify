@@ -1,6 +1,6 @@
 {
   "name": "@datorama/themify",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "CSS themes made easy. A robust, opinionated solution to manage themes in your web application",
   "main": "index.js",
   "gh-pages-deploy": {
@@ -21,7 +21,9 @@
     "test": "cross-env NODE_ENV=test npm run sass:support && jest",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "precommit": "lint-staged",
-    "sass:support": "node replace.js"
+    "sass:support": "node replace.js",
+    "travis-deploy-once": "travis-deploy-once",
+    "semantic-release": "semantic-release"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -90,7 +92,8 @@
     "typescript": "^2.7.2",
     "@semantic-release/changelog": "^2.0.1",
     "@semantic-release/git": "^4.0.1",
-    "@semantic-release/npm": "^3.2.2"
+    "@semantic-release/npm": "^3.2.2",
+    "travis-deploy-once": "^5.0.0"
   },
   "release": {
     "verifyConditions": [
@@ -112,5 +115,9 @@
         "pkgRoot": "dist"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datorama/themify.git"
   }
 }
