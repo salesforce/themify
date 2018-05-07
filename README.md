@@ -147,7 +147,7 @@ The **themify** function received the name of the color, defined in the **palett
 }
 ```
 
-#### Basic Usage
+#### Basic usage
 
 ```scss
 button {
@@ -173,7 +173,6 @@ The above example will produce the following CSS:
 
 And the following fallback for IE11:
 
-##### fallback CSS:
 ```css
 button {
   background-color: #f2f2f4;
@@ -194,7 +193,7 @@ button:hover {
 }
 ```
 
-#### A Different Color For each palette
+#### A different color for each palette
 
 Sometimes we need more control over the colors so it's possible to specify explicitly one color for **light** and another color for **dark**:
 
@@ -216,7 +215,7 @@ The above example will produce the following CSS:
 }
 ```
 
-#### Advanced Usage
+#### Advanced usage
 
 `themify` can be combined with every valid CSS:
 
@@ -244,7 +243,7 @@ Even in your animations:
 }
 ```
 
-#### Runtime Replacement
+#### Runtime replacement
 
 First, we'll create our own theme service.
 
