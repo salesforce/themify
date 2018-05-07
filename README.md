@@ -14,7 +14,7 @@ A robust, opinionated solution to manage themes in your web application.
 Themify is a PostCSS plugin that generates your theme during the build phase. 
 The main concept behind it is to provide two palettes, one for light and one for dark which is basically the inverse of the light.
 
-Under the hood, *themify* will replace your CSS colors, with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
+Under the hood, `themify` will replace your CSS colors, with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
 
   
 ## 🤓 Features
@@ -30,8 +30,6 @@ Under the hood, *themify* will replace your CSS colors, with CSS variables, and 
 * 🔥 **Legacy Browser Support** - support for all browsers including IE11.
 
   
-View a full [demo](http://comingsoon.com) (coming soon...).
-
 ## Usage
 
 
@@ -47,7 +45,7 @@ View a full [demo](http://comingsoon.com) (coming soon...).
 |screwIE11|boolean|`true`|Whether to generate a fallback for legacy browsers (ahm..ahm..) that do not supports CSS Variables|
 |fallback|`{cssPath: string \| null, dynamicPath: string \| null}`|`{}`|`cssPath`: An absolute path to the fallback CSS. <br>`dynamicPath`: An absolute path to the fallback JSON. This file contains variable that will be replace in runtime, for legacy browsers|
 
-### Phase one - Add themify to your build pipe: 
+#### Add themify to your build pipe: 
 
 ```js
 const themifyOptions = {  
@@ -67,13 +65,13 @@ const themifyOptions = {
   },
   screwIE11 : false,  
   fallback : {  
-    cssPath : './dist/theme_fallback.css',  
+    cssPath : './dist/theme_fallback.css', // use checksum 
     dynamicPath: './dist/theme_fallback.json'  
   }  
 };
 ```
 
-#### Gulp
+##### Gulp
 
 ```js
 gulp.src('./main.scss')  
@@ -86,7 +84,7 @@ gulp.src('./main.scss')
     .pipe(gulp.dest('dist'));
 ```
 
-#### Webpack
+##### Webpack
 
 ```js
 const isProd = process.env.ENV === 'production';
@@ -127,9 +125,7 @@ const getLoaders = () => [{
 ```
 
 
-### Phase two - Add themify to SASS
-
-#### Perquisites
+#### Add themify to SASS
 
 In order to use the `themify` function and other SASS helpers, you need to import the `themify` library from your main SASS file:
 
@@ -137,11 +133,9 @@ In order to use the `themify` function and other SASS helpers, you need to impor
 @import 'node_modules/datorama/themify/dist/themify';
 ```
 
-#### The themify function
+##### The themify function
 The **themify** function received the name of the color, defined in the **palette** map, during the build phase.<br>
 **themify** will generate a CSS selector for each palette: one for *light* and one for *dark*.
-
-##### themify API
 
 ```scss
 .my-awesome-selector {
@@ -251,7 +245,7 @@ Even in your animations:
 }
 ```
 
-### Runtime Replacement
+#### Runtime Replacement
 
 First, we'll create our own theme service.
 
@@ -299,7 +293,7 @@ themeService.setColors({
 ```
 
  
-### Changing the active palette
+#### Changing the active palette
 
 In order to switch between dark and light, just add the appropriate class on the desire HTML element. Consider the following example:
 
