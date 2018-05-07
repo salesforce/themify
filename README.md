@@ -29,7 +29,9 @@ Under the hood, `themify` will replace your CSS colors with CSS variables, and a
 
 * 🔥 **Legacy Browser Support** - support for all major browsers including IE11
 
-  
+## Installation
+`npm install @datorama/themify --save`
+
 ## Usage
 
 #### Options
