@@ -9,25 +9,25 @@
 
 > *CSS Themes Made Easy*
 
-A robust, opinionated solution to manage themes in your web application.
+Themify lets you manage your application’s themes in realtime, using a robust solution that’s easily configurable.
 
 Themify is a PostCSS plugin that generates your theme during the build phase. 
-The main concept behind it is to provide two palettes, one for light and one for dark which is basically the inverse of the light.
+The main concept behind it is to provide two palettes, one light and one dark (resembles the inverse of the light palette).
 
-Under the hood, `themify` will replace your CSS colors, with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
+Under the hood, `themify` will replace your CSS colors with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
 
   
 ## 🤓 Features
 
-* 🖌 **Light &  Dark palettes** - define your theme in a simple JSON format
+* 🖌 **Light &  Dark palettes** - define your theme using a simple JSON format
 
 * 🎨 **Replace your colors in runtime** - provide your clients **white-labeling** capabilities. Let them choose their own colors and replace them instantly
 
 * :pencil2: **Use it inside your CSS** - use your theme directly in your SASS files, no JavaScript is required
 
-* 🏃 **Runtime replacement** - change the active palette at runtime, for the whole application, or for a specific HTML container
+* 🏃 **Runtime replacement** - change the active palette at runtime, either for the entire application or for a specific HTML container
 
-* 🔥 **Legacy Browser Support** - support for all browsers including IE11.
+* 🔥 **Legacy Browser Support** - support for all major browsers including IE11
 
   
 ## Usage
@@ -39,11 +39,11 @@ Under the hood, `themify` will replace your CSS colors, with CSS variables, and 
 
 |Input|Type|Default|Description|
 |---|---|---|---|
-|createVars|boolean|`true`|Whether we would like to generate the CSS variables. This should be true, unless you want to inject them yourself|
-|palette|`{light: [key: string]: string, dark: [key: string]: string}`|`{}`|Palette Colors|
-|classPrefix|string|`''`|A class prefix to append to each generated theme class|
-|screwIE11|boolean|`true`|Whether to generate a fallback for legacy browsers (ahm..ahm..) that do not supports CSS Variables|
-|fallback|`{cssPath: string \| null, dynamicPath: string \| null}`|`{}`|`cssPath`: An absolute path to the fallback CSS. <br>`dynamicPath`: An absolute path to the fallback JSON. This file contains variable that will be replace in runtime, for legacy browsers|
+|createVars|boolean|`true`|Determines whether CSS variables are automatically generated. This should kept as true, unless you want to inject them yourself.|
+|palette|`{light: [key: string]: string, dark: [key: string]: string}`|`{}`|Palette colors|
+|classPrefix|string|`''`|A class prefix to append to each generated theme class.|
+|screwIE11|boolean|`true`|Whether to generate a fallback for legacy browsers that do not supports CSS Variables.|
+|fallback|`{cssPath: string \| null, dynamicPath: string \| null}`|`{}`|`cssPath`: An absolute path to the fallback CSS. <br>`dynamicPath`: An absolute path to the fallback JSON.|
 
 #### Add themify to your build pipe: 
 
@@ -133,8 +133,8 @@ In order to use the `themify` function and other SASS helpers, you need to impor
 @import 'node_modules/datorama/themify/dist/themify';
 ```
 
-The **themify** function received the name of the color, defined in the **palette** map, during the build phase.<br>
-**themify** will generate a CSS selector for each palette: one for *light* and one for *dark*.
+The `themify` function received the name of the color, defined in the `palette` map, during the build phase.<br>
+`themify` will generate CSS selectors for each palette: one for the light palette and one for the dark one.
 
 ```scss
 .my-awesome-selector {
@@ -261,8 +261,10 @@ export class MyThemeService {
     /**
     * load the CSS fallback file, in case the browser do not support CSS Variables.
     * Required only if you set screwIE11 option to false. 
+    *
+    * callback - load event for the CSS file
     */
-    loadCSSVariablesFallback(themeCSSFallback);	
+    loadCSSVariablesFallback(themeCSSFallback, callback);	
   }
 
   /**  
@@ -293,7 +295,7 @@ themeService.setColors({
  
 #### Changing the active palette
 
-In order to switch between dark and light, just add the appropriate class on the desire HTML element. Consider the following example:
+In order to switch between the dark and light palettes, simply add the appropriate class to the desired HTML element.
 
 ```scss
 p {
@@ -309,9 +311,9 @@ p {
 </div>
 ```
 ### Theme class helpers
-You can take an advantage of your themes not just in your CSS, but also directly in your HTML, by generating a CSS class for each color you defined.
+You can take advantage of your themes not just in your CSS, but also directly in your HTML, by generating a CSS class for each color you define.
 
-In order to achieve this, use the **generateThemeHelpers** mixin, and pass the CSS properties you want to generate. For example:
+In order to achieve this, use the `generateThemeHelpers` mixin, and pass the CSS properties you want to generate. For example:
 
 ```scss
 // generates the following predefined classes, for each color  
@@ -348,7 +350,7 @@ This will generate the following CSS:
 and so on..
 
 As you see, you can pass any CSS property, including pseudo classes.
-The following SASS map represent the pseudo key and his actual value:
+The following SASS map details the pseudo class keys and their values:
 
 ```sass
 $PSEUDO_CLASSES: (  
