@@ -133,7 +133,6 @@ In order to use the `themify` function and other SASS helpers, you need to impor
 @import 'node_modules/datorama/themify/dist/themify';
 ```
 
-##### The themify function
 The **themify** function received the name of the color, defined in the **palette** map, during the build phase.<br>
 **themify** will generate a CSS selector for each palette: one for *light* and one for *dark*.
 
