@@ -32,9 +32,6 @@ Under the hood, `themify` will replace your CSS colors with CSS variables, and a
   
 ## Usage
 
-
-### Build
-
 #### Options
 
 |Input|Type|Default|Description|
