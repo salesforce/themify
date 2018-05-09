@@ -15,7 +15,7 @@ const optionsTwo = {
 
 try {
   if(process.env.NODE_ENV === 'test') {
-    const changes = replace.sync(options);
+    const changes = replace.sync(optionsTwo);
   } else {
     const changes = replace.sync(optionsTwo);
   }

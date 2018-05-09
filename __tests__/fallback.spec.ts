@@ -52,7 +52,7 @@ function test(inputFile, options, done) {
 
   return TestUtils.processFile(inputFile, getPlugins(myOptions)).then(() => {
     setTimeout(() => {
-      const cssTempContent = TestUtils.minify(TestUtils.readFile(cssTmp.name));
+      const cssTempContent = TestUtils.readFile(cssTmp.name);
       const jsonTempContent = minifyJSON(TestUtils.readFile(dynamicTmp.name));
 
       const cssTempExpectedContent = TestUtils.minify(TestUtils.readFile(inputFile.replace("input", "output-css")));

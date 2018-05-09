@@ -1,3 +1,5 @@
+import {minifyCSS} from "../src/helpers/css.util";
+
 const cleanCSS =  require("clean-css");
 const glob = require("glob");
 const path = require('path');
@@ -13,14 +15,6 @@ import unmatchPalette from './palettes/unmatch-palette';
 const {initThemify, themify} = require('../src/index');
 
 export class TestUtils {
-
-    private static _cleanCss;
-    private static get cleanCss() {
-        if (!this._cleanCss) {
-            this._cleanCss = new cleanCSS({});
-        }
-        return this._cleanCss;
-    }
 
     static plugin = {
         initThemify,
@@ -81,7 +75,7 @@ export class TestUtils {
     }
 
     static minify(css) {
-        return this.cleanCss.minify(css).styles;
+        return minifyCSS(css);
     }
 
     static readFile(fileName) {
