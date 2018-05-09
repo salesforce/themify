@@ -21,7 +21,7 @@ Under the hood, `themify` will replace your CSS colors with CSS variables, and a
 
 * 🖌 **Light &  Dark palettes** - define your theme using a simple JSON format
 
-* 🎨 **Replace your colors in runtime** - provide your clients **white-labeling** capabilities. Let them choose their own colors and replace them instantly
+* 🎨 **Replace your colors in runtime** - provide your clients with  **white-labeling** capabilities. Let them choose their own colors and replace them instantly
 
 * :pencil2: **Use it inside your CSS** - use your theme directly in your SASS files, no JavaScript is required
 
@@ -132,8 +132,7 @@ In order to use the `themify` function and other SASS helpers, you need to impor
 @import 'node_modules/datorama/themify/dist/themify';
 ```
 
-The `themify` function received the name of the color, defined in the `palette` map, during the build phase.<br>
-`themify` will generate CSS selectors for each palette: one for the light palette and one for the dark one.
+The themify function receives as parameters the name of the color defined in the palette map and an optional opacity parameter. Themify will generate CSS selectors for each palette — one for the light and one for the dark.
 
 ```scss
 .my-awesome-selector {
