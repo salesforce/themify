@@ -16,7 +16,8 @@ The main concept behind it is to provide two palettes, one light and one dark (r
 
 Under the hood, `themify` will replace your CSS colors with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
 
-  
+[Introducing Themify: CSS Themes Made Easy](https://netbasal.com/introducing-themify-css-themes-made-easy-711a05813f3b)
+
 ## 🤓 Features
 
 * 🖌 **Light &  Dark palettes** - define your theme using a simple JSON format
