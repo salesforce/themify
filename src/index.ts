@@ -1,13 +1,11 @@
 import { minifyJSON } from './helpers/json.util';
+import { minifyCSS } from './helpers/css.util';
 
 const postcss = require('postcss');
 const fs = require('fs-extra');
 const hexToRgba = require('hex-to-rgba');
 const THEMIFY = 'themify';
 const JSToSass = require('./helpers/js-sass');
-const _cleanCSS = require('clean-css');
-
-const cleanCSS = new _cleanCSS();
 
 export interface ThemifyOptions {
   /**
@@ -226,6 +224,10 @@ function themify(options: ThemifyOptions) {
    */
   function processRules(root) {
     root.walkRules(rule => {
+      if (!hasThemify(rule.toString())) {
+        return;
+      }
+
       let aggragatedSelectorsMap = {};
       let aggragatedSelectors: string[] = [];
 
@@ -245,9 +247,9 @@ function themify(options: ThemifyOptions) {
         decl.value = defaultVariationValue;
 
         // indicate if we have a global rule, that cannot be nested
-        const isGlobalRule = rule.parent && rule.parent.type === 'atrule' && /keyframes/.test(rule.parent.name);
+        const createNonDefaultVariationRules = isAtRule(rule);
         // don't create extra CSS for global rules
-        if (isGlobalRule) {
+        if (createNonDefaultVariationRules) {
           return;
         }
 
@@ -296,6 +298,15 @@ function themify(options: ThemifyOptions) {
   }
 
   /**
+   * indicate if we have a global rule, that cannot be nested
+   * @param rule
+   * @return {boolean}
+   */
+  function isAtRule(rule) {
+    return rule.parent && rule.parent.type === 'atrule';
+  }
+
+  /**
    * Walk through all rules, and generate a CSS fallback for legacy browsers.
    * Two files shall be created for full compatibility:
    *  1. A CSS file, contains all the rules with the original color representation.
@@ -315,16 +326,79 @@ function themify(options: ThemifyOptions) {
     // define which modes need to be processed
     const execModes = [ExecutionMode.CSS_COLOR, ExecutionMode.DYNAMIC_EXPRESSION];
 
+    walkFallbackAtRules(root, execModes, output);
+    walkFallbackRules(root, execModes, output);
+
+    writeFallbackCSS(output);
+  }
+
+  function writeFallbackCSS(output) {
+    // write the CSS & JSON to external files
+    if (output[ExecutionMode.CSS_COLOR].length) {
+      // write CSS fallback;
+      const fallbackCss = output[ExecutionMode.CSS_COLOR].join('');
+
+      writeToFile(options.fallback.cssPath as string, minifyCSS(fallbackCss));
+
+      // creating a JSON for the dynamic expressions
+      const jsonOutput = {};
+      variationValues.forEach(variationName => {
+        jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
+        jsonOutput[variationName] = minifyJSON(jsonOutput[variationName].join(''));
+        // minify the CSS output
+        jsonOutput[variationName] = minifyCSS(jsonOutput[variationName]);
+      });
+
+      // stringify and save
+      const dynamicCss = JSON.stringify(jsonOutput);
+
+      writeToFile(options.fallback.dynamicPath as string, dynamicCss);
+    }
+  }
+
+  function walkFallbackAtRules(root, execModes, output) {
+    root.walkAtRules(atRule => {
+      if (atRule.nodes && hasThemify(atRule.toString())) {
+        execModes.forEach(mode => {
+          const clonedAtRule = atRule.clone();
+
+          clonedAtRule.nodes.forEach(rule => {
+            rule.walkDecls(decl => {
+              const propertyValue = decl.value;
+
+              // replace the themify token, if exists
+              if (hasThemify(propertyValue)) {
+                const colorMap = getThemifyValue(propertyValue, mode);
+                decl.value = colorMap[defaultVariation];
+              }
+            });
+          });
+
+          let rulesOutput = mode === ExecutionMode.DYNAMIC_EXPRESSION ? output[mode][defaultVariation] : output[mode];
+          rulesOutput.push(clonedAtRule);
+        });
+      }
+    });
+  }
+
+  function walkFallbackRules(root, execModes, output) {
     root.walkRules(rule => {
+      if (isAtRule(rule) || !hasThemify(rule.toString())) {
+        return;
+      }
+
       const ruleModeMap = {};
 
       rule.walkDecls(decl => {
         const propertyValue = decl.value;
+
         if (!hasThemify(propertyValue)) return;
 
         const property = decl.prop;
 
         execModes.forEach(mode => {
+          const colorMap = getThemifyValue(propertyValue, mode);
+
           // lazily creating a new rule for each variation, for the specific mode
           if (!ruleModeMap.hasOwnProperty(mode)) {
             ruleModeMap[mode] = {};
@@ -339,17 +413,12 @@ function themify(options: ThemifyOptions) {
 
               // push the new rule into the right place,
               // so we can write them later to external file
-              let rulesOutput = output[mode];
-              if (!Array.isArray(rulesOutput)) {
-                rulesOutput = rulesOutput[variationName];
-              }
+              let rulesOutput = mode === ExecutionMode.DYNAMIC_EXPRESSION ? output[mode][variationName] : output[mode];
               rulesOutput.push(newRule);
 
               ruleModeMap[mode][variationName] = newRule;
             });
           }
-
-          const colorMap = getThemifyValue(propertyValue, mode);
 
           // create and append a new declaration
           variationValues.forEach(variationName => {
@@ -362,28 +431,6 @@ function themify(options: ThemifyOptions) {
         });
       });
     });
-
-    // write the CSS & JSON to external files
-    if (output[ExecutionMode.CSS_COLOR].length) {
-      // write CSS fallback;
-      const fallbackCss = output[ExecutionMode.CSS_COLOR].join('');
-
-      writeToFile(options.fallback.cssPath as string, fallbackCss);
-
-      // creating a JSON for the dynamic expressions
-      const jsonOutput = {};
-      variationValues.forEach(variationName => {
-        jsonOutput[variationName] = output[ExecutionMode.DYNAMIC_EXPRESSION][variationName] || [];
-        jsonOutput[variationName] = minifyJSON(jsonOutput[variationName].join(''));
-        // minify the CSS output
-        jsonOutput[variationName] = cleanCSS.minify(jsonOutput[variationName]).styles;
-      });
-
-      // stringify and save
-      const dynamicCss = JSON.stringify(jsonOutput);
-
-      writeToFile(options.fallback.dynamicPath as string, dynamicCss);
-    }
   }
 
   function createDecl(prop, value) {
@@ -423,8 +470,8 @@ function themify(options: ThemifyOptions) {
       .join(',');
   }
 
-  function cloneEmptyRule(rule) {
-    const clonedRule = rule.clone();
+  function cloneEmptyRule(rule, overrideConfig?) {
+    const clonedRule = rule.clone(overrideConfig);
     // remove all the declaration from this rule
     clonedRule.removeAll();
     return clonedRule;
