@@ -22,7 +22,7 @@ function loadCSS(path) {
   const head = document.getElementsByTagName('head')[0];
   const style = document.createElement('link');
   style.href = path;
-  style.id = 'themify-fallback';
+  style.id = 'themify-ie';
   style.type = 'text/css';
   style.rel = 'stylesheet';
   head.appendChild(style);
@@ -35,7 +35,6 @@ function loadCSS(path) {
 function injectStyle(style) {
   var node = document.createElement('style');
   node.id = 'themify';
-  console.log('injecting style', style);
   node.innerHTML = style;
   document.head.appendChild(node);
 }
@@ -74,21 +73,7 @@ function generateNewVariables(customTheme) {
  * @returns {boolean}
  */
 function hasNativeCSSProperties() {
-  return false;
-  const opacity = '1';
-  const el = document.head;
-  let hasNativeCSSProperties;
-
-  // Setup CSS properties.
-  el.style.setProperty('--test-opacity', opacity);
-  el.style.setProperty('opacity', 'var(--test-opacity)');
-
-  // Feature detect then remove all set properties.
-  hasNativeCSSProperties = window.getComputedStyle(el).opacity == opacity;
-  el.style.setProperty('--test-opacity', '');
-  el.style.opacity = '';
-
-  return hasNativeCSSProperties;
+  return window.CSS && window.CSS.supports && window.CSS.supports('--fake-var', 0);
 }
 
 /**
