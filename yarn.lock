@@ -144,6 +144,14 @@
   dependencies:
     find-up "^2.1.0"
 
+"@datorama/postcss-node-sass@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@datorama/postcss-node-sass/-/postcss-node-sass-1.0.0.tgz#511561a2d15fa9b2738c6e001dc4bfda1c823f22"
+  dependencies:
+    merge-source-map "^1.0.4"
+    node-sass "4.9.0"
+    postcss "^6.0.22"
+
 "@marionebl/sander@^0.6.0":
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@marionebl/sander/-/sander-0.6.1.tgz#1958965874f24bc51be48875feb50d642fc41f7b"
@@ -1631,7 +1639,7 @@ chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0, chalk@^2.3.2:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^2.1.0:
+chalk@^2.1.0, chalk@^2.4.1:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.1.tgz#18c49ab16a037b6eb0152cc83e3471338215b66e"
   dependencies:
@@ -5913,10 +5921,6 @@ nan@^2.10.0, nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
-nan@^2.3.2:
-  version "2.9.2"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.9.2.tgz#f564d75f5f8f36a6d9456cca7a6c4fe488ab7866"
-
 nanomatch@^1.2.9:
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.9.tgz#879f7150cb2dab7a471259066c104eee6e0fa7c2"
@@ -6045,9 +6049,9 @@ node-pre-gyp@^0.9.0:
     semver "^5.3.0"
     tar "^4"
 
-node-sass@^4.7.2:
-  version "4.7.2"
-  resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.7.2.tgz#9366778ba1469eb01438a9e8592f4262bcb6794e"
+node-sass@4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.9.0.tgz#d1b8aa855d98ed684d6848db929a20771cc2ae52"
   dependencies:
     async-foreach "^0.1.3"
     chalk "^1.1.1"
@@ -6061,7 +6065,7 @@ node-sass@^4.7.2:
     lodash.mergewith "^4.6.0"
     meow "^3.7.0"
     mkdirp "^0.5.1"
-    nan "^2.3.2"
+    nan "^2.10.0"
     node-gyp "^3.3.1"
     npmlog "^4.0.0"
     request "~2.79.0"
@@ -6976,15 +6980,7 @@ postcss-load-plugins@^2.3.0:
     cosmiconfig "^2.1.1"
     object-assign "^4.1.0"
 
-postcss-node-sass@2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/postcss-node-sass/-/postcss-node-sass-2.1.4.tgz#8d3eb92297a23356072b277661705972fd0dfab5"
-  dependencies:
-    merge-source-map "^1.0.4"
-    node-sass "^4.7.2"
-    postcss "^6.0.14"
-
-postcss@^6.0.0, postcss@^6.0.14:
+postcss@^6.0.0:
   version "6.0.19"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.19.tgz#76a78386f670b9d9494a655bf23ac012effd1555"
   dependencies:
@@ -6999,6 +6995,14 @@ postcss@^6.0.19:
     chalk "^2.3.2"
     source-map "^0.6.1"
     supports-color "^5.3.0"
+
+postcss@^6.0.22:
+  version "6.0.22"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.22.tgz#e23b78314905c3b90cbd61702121e7a78848f2a3"
+  dependencies:
+    chalk "^2.4.1"
+    source-map "^0.6.1"
+    supports-color "^5.4.0"
 
 prebuild-install@^2.4.1:
   version "2.5.3"
@@ -7498,14 +7502,6 @@ replace-ext@0.0.1:
 replace-ext@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/replace-ext/-/replace-ext-1.0.0.tgz#de63128373fcbf7c3ccfa4de5a480c45a67958eb"
-
-replace-in-file@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/replace-in-file/-/replace-in-file-3.4.0.tgz#b48c94567bbf4f44a2bc6fabdf21ab443e806851"
-  dependencies:
-    chalk "^2.3.2"
-    glob "^7.1.2"
-    yargs "^11.0.0"
 
 request-debug@^0.2.0:
   version "0.2.0"
@@ -8621,6 +8617,12 @@ supports-color@^3.1.2:
 supports-color@^5.2.0, supports-color@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.3.0.tgz#5b24ac15db80fa927cf5227a4a33fd3c4c7676c0"
+  dependencies:
+    has-flag "^3.0.0"
+
+supports-color@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.4.0.tgz#1c6b337402c2137605efe19f10fec390f6faab54"
   dependencies:
     has-flag "^3.0.0"
 

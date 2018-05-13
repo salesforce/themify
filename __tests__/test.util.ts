@@ -1,11 +1,9 @@
 import {minifyCSS} from "../src/helpers/css.util";
-
-const cleanCSS =  require("clean-css");
 const glob = require("glob");
 const path = require('path');
 const fs = require('fs');
 const postcss = require('postcss');
-const sass = require('postcss-node-sass');
+const sass = require('@datorama/postcss-node-sass');
 
 import {ProcessOptions} from "postcss";
 import palette from './palettes/palette';

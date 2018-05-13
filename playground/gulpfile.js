@@ -1,5 +1,5 @@
 const rename = require('gulp-rename');
-const sass = require('postcss-node-sass');
+const sass = require('@datorama/postcss-node-sass');
 const postcss = require('gulp-postcss');
 const gulp = require('gulp');
 const { initThemify, themify } = require('../dist');
