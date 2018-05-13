@@ -1,3 +1,11 @@
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/datorama/themify/compare/v1.0.1...v1.0.2) (2018-05-13)
+
+
+### Bug Fixes
+
+* **tests:** upgrade node-sass to latest version ([b4e66f5](https://github.com/datorama/themify/commit/b4e66f5))
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/datorama/themify/compare/v1.0.0...v1.0.1) (2018-05-10)
 
