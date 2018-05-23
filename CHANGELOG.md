@@ -1,3 +1,11 @@
+<a name="1.0.4"></a>
+## [1.0.4](https://github.com/datorama/themify/compare/v1.0.3...v1.0.4) (2018-05-23)
+
+
+### Bug Fixes
+
+* **npm:** add readme file ([cb3aa35](https://github.com/datorama/themify/commit/cb3aa35))
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://github.com/datorama/themify/compare/v1.0.2...v1.0.3) (2018-05-23)
 
