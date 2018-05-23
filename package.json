@@ -7,6 +7,20 @@
     "staticpath": "playground",
     "commit": "pages"
   },
+  "readme": "https://github.com/datorama/themify#readme",
+  "contributors": [{
+      "name": "Netanel Basal",
+      "url": "https://netbasal.com"
+    },
+    {
+      "name": "Amit Bar Hanin"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/datorama/themify/issues"
+  },
+  "license": "Apache License 2.0",
+  "homepage": "https://github.com/datorama/themify#readme",
   "scripts": {
     "setup": "semantic-release-cli setup",
     "github-pages": "gh-pages-deploy",
@@ -107,12 +121,10 @@
       },
       "@semantic-release/git"
     ],
-    "publish": [
-      {
-        "path": "@semantic-release/npm",
-        "pkgRoot": "dist"
-      }
-    ]
+    "publish": [{
+      "path": "@semantic-release/npm",
+      "pkgRoot": "dist"
+    }]
   },
   "repository": {
     "type": "git",
