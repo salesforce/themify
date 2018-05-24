@@ -28,7 +28,7 @@
     "play": "gulp --gulpfile ./playground/gulpfile.js",
     "commit": "git-cz",
     "build": "npm run clean:dist && tsc && npm run copy:dist",
-    "copy:dist": "cp -R src/sass/. package.json dist",
+    "copy:dist": "cp -R src/sass/. package.json README.md dist",
     "clean:dist": "rimraf dist",
     "format": "prettier --write --config .prettierrc src/*.ts src/**/*.ts playground/*.js",
     "test": "jest",
@@ -61,8 +61,7 @@
   ],
   "author": "Datorama",
   "dependencies": {
-    "fs-extra": "^5.0.0",
-    "hex-to-rgba": "^1.0.1"
+    "fs-extra": "^5.0.0"
   },
   "config": {
     "github_deploy_source": "playground",

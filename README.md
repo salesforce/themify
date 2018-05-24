@@ -11,12 +11,12 @@
 
 Themify lets you manage your application’s themes in realtime, using a robust solution that’s easily configurable.
 
-Themify is a PostCSS plugin that generates your theme during the build phase. 
+Themify is a PostCSS plugin that generates your theme during the build phase.
 The main concept behind it is to provide two palettes, one light and one dark (resembles the inverse of the light palette).
 
 Under the hood, `themify` will replace your CSS colors with CSS variables, and also take care to provide a fallback for unsupported browsers (such as IE11).
 
-[Introducing Themify: CSS Themes Made Easy](https://netbasal.com/introducing-themify-css-themes-made-easy-711a05813f3b)
+[Introducing Themify: CSS Themes Made Easy](https://engineering.datorama.com/introducing-themify-css-themes-made-easy-669b7ecb8720)
 
 ## 🤓 Features
 
@@ -397,6 +397,21 @@ Now you can use the generated CSS classes directly in your HTML:
 	The active color will be primary-200
 </a>
 ```
+
+## Known issues
+- We discovered that Safari doesn't support the following syntax when it comes to borders with CSS variables:
+```css
+/** This will NOT work */
+border: 1px solid themify(primary-100);
+
+/** This will work */
+border-color: themify(primary-100);
+
+/** This will work */
+border: themify(primary-100) 1px solid;
+```
+
+- Safari doesn't support box-shadow.
 
 ## Contributors
 
