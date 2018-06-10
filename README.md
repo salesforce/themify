@@ -1,6 +1,5 @@
 ![themify](https://i.imgur.com/JZyjWm6.png)
-
-[![Build Status](https://travis-ci.org/datorama/themify.svg?branch=master)](https://travis-ci.org/datorama/themify)
+[![Build Status](https://img.shields.io/travis/datorama/themify.svg?style=flat-square)](https://travis-ci.org/datorama/themify)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 [![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)]()
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)]()
