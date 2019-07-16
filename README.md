@@ -129,7 +129,7 @@ const getLoaders = () => [{
 In order to use the `themify` function and other SASS helpers, you need to import the `themify` library from your main SASS file:
 
 ```sass
-@import 'node_modules/datorama/themify/dist/themify';
+@import 'node_modules/datorama/themify/themify';
 ```
 
 The themify function receives as parameters the name of the color defined in the palette map and an optional opacity parameter. Themify will generate CSS selectors for each palette — one for the light and one for the dark.
