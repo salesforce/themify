@@ -59,7 +59,8 @@
     "CSS themes",
     "CSS variables",
     "themes",
-    "css vars"
+    "css vars",
+    "sass themes"
   ],
   "author": "Datorama",
   "dependencies": {
