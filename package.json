@@ -101,7 +101,7 @@
     "postcss": "^6.0.19",
     "prettier": "^1.11.1",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.13.19",
+    "semantic-release": "^17.2.3",
     "semantic-release-cli": "^5.1.1",
     "tmp": "0.0.33",
     "travis-deploy-once": "^5.0.0",
